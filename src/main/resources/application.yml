@@ -1,0 +1,29 @@
+KAFKA_BOOTSTRAP_SERVER: ${SYSTEM_IP}:9092
+KAFKA_TARGET_TOPIC_NAME: target_topic
+KAFKA_DLT_TOPIC_NAME: dead_letter_topic
+KAFKA_CLAIM_CHECk_TOPIC: claim_check_topic
+KAFKA_CLAIM_CHECK_STORAGE_LOCATION: 'C:/Temp'
+
+app:
+  kafka:
+    host: ${KAFKA_BOOTSTRAP_SERVER}
+    topic: ${KAFKA_TARGET_TOPIC_NAME}
+    dead-letter-topic: ${KAFKA_DLT_TOPIC_NAME}
+    claim_check_topic: ${KAFKA_CLAIM_CHECk_TOPIC}
+    consumer-group-id: user-consumer-group
+    record-too-large-path: ${KAFKA_CLAIM_CHECK_STORAGE_LOCATION}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+#logging:
+#  level:
+#    org.apache.kafka: ERROR
+#    org.springframework.kafka.listener: ERROR
