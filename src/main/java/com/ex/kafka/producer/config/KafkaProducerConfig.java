@@ -8,6 +8,8 @@ import io.micrometer.core.instrument.Metrics;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.MicrometerProducerListener;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.ProducerListener;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.retry.annotation.EnableRetry;
 
@@ -50,9 +53,7 @@ public class KafkaProducerConfig {
         DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.ACKS_CONFIG, kafkaConfiguration.getProducerAcksConfig());
         DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, kafkaConfiguration.getRetryBackoffMs());
         DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, kafkaConfiguration.getMaxRequestSize());
-        //1000 ms for timeout incase of wrong topic name / any other reason
         DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, kafkaConfiguration.getMaxBlockMs());
-
 
 //        if (Boolean.TRUE.equals(kafkaConfiguration.getSaslRequired())) {
 //            DEFAULT_PRODUCER_CONFIG_MAP.put("security.protocol", kafkaConfiguration.getSecurityProtocol());
@@ -63,7 +64,20 @@ public class KafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, Data> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
+        KafkaTemplate<String, Data> kafkaTemplate = new KafkaTemplate<>(producerFactory());
+        kafkaTemplate.setProducerListener(new ProducerListener<String, Data>() {
+            @Override
+            public void onSuccess(
+                    ProducerRecord<String, Data> producerRecord,
+                    RecordMetadata recordMetadata) {
+
+                log.info("ACK from ProducerListener message: {} partition: {} offset:  {}",
+                        producerRecord.value(),
+                        producerRecord.partition(),
+                        recordMetadata.offset());
+            }
+        });
+        return kafkaTemplate;
     }
 
     @Bean
@@ -79,7 +93,20 @@ public class KafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, ClaimCheck> kafkaClaimCheckTemplate() {
-        return new KafkaTemplate<>(producerClaimCheckFactory());
+        KafkaTemplate<String, ClaimCheck> kafkaTemplate = new KafkaTemplate<>(producerClaimCheckFactory());
+        kafkaTemplate.setProducerListener(new ProducerListener<String, ClaimCheck>() {
+            @Override
+            public void onSuccess(
+                    ProducerRecord<String, ClaimCheck> producerRecord,
+                    RecordMetadata recordMetadata) {
+
+                log.info("ACK from ProducerListener message: {} partition: {} offset:  {}",
+                        producerRecord.value(),
+                        producerRecord.partition(),
+                        recordMetadata.offset());
+            }
+        });
+        return kafkaTemplate;
     }
 
     @Bean
