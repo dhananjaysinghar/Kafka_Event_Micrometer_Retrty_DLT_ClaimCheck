@@ -30,7 +30,7 @@ public class KafkaConfiguration {
     private int producerRequestTimeoutMs;
     @Value("${app.kafka.producer.retry.backoff.ms:500}")
     private int retryBackoffMs;
-    @Value("${app.kafka.producer.max.block.ms:1000}")
+    @Value("${app.kafka.producer.max.block.ms:5000}")
     private int maxBlockMs;
     @Value("${app.kafka.producer.compression.type:gzip}")
     private String compressionType;
