@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.errors.InvalidTopicException;
 import org.apache.kafka.common.errors.RecordTooLargeException;
 import org.apache.kafka.common.errors.TimeoutException;
 import org.apache.kafka.common.errors.TopicAuthorizationException;
@@ -73,7 +74,7 @@ public class UserKafkaSender {
             try {
                 ArrayList<String> topicNames = new ArrayList<>(adminClient.listTopics().names().get());
                 if (!CollectionUtils.isEmpty(topicNames) && !topicNames.contains(topicName)) {
-                    throw new TopicAuthorizationException("Topic " + topicName + " is not exist in metadata");
+                    throw new InvalidTopicException("Topic " + topicName + " is not exist in metadata");
                 }
                 ProducerRecord<String, ClaimCheck> producerRecord = new ProducerRecord<>(topicName, UUID.randomUUID().toString(), claimCheck);
                 producerRecord.headers().add("X-HEADER-VALUE", "TEST-DATA".getBytes(StandardCharsets.UTF_8));
@@ -101,7 +102,7 @@ public class UserKafkaSender {
         try {
             ArrayList<String> topicNames = new ArrayList<>(adminClient.listTopics().names().get());
             if (!CollectionUtils.isEmpty(topicNames) && !topicNames.contains(topicName)) {
-                throw new TopicAuthorizationException("Topic " + topicName + " is not exist in metadata");
+                throw new InvalidTopicException("Topic " + topicName + " is not exist in metadata");
             }
             ProducerRecord<String, Data> producerRecord = new ProducerRecord<>(topicName, UUID.randomUUID().toString(), data);
             producerRecord.headers().add("X-HEADER-VALUE", "TEST-DATA".getBytes(StandardCharsets.UTF_8));
