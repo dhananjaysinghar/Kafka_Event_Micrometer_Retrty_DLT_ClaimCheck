@@ -50,6 +50,8 @@ public class KafkaProducerConfig {
         DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.ACKS_CONFIG, kafkaConfiguration.getProducerAcksConfig());
         DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, kafkaConfiguration.getRetryBackoffMs());
         DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, kafkaConfiguration.getMaxRequestSize());
+        //1000 ms for timeout incase of wrong topic name / any other reason
+        DEFAULT_PRODUCER_CONFIG_MAP.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, kafkaConfiguration.getMaxBlockMs());
 
 
 //        if (Boolean.TRUE.equals(kafkaConfiguration.getSaslRequired())) {
